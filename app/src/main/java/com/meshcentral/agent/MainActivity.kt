@@ -15,6 +15,7 @@ import android.content.IntentFilter
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.Color
+import android.graphics.Point
 import android.media.projection.MediaProjectionManager
 import android.net.Uri
 import android.os.Build
@@ -97,6 +98,12 @@ class MainActivity : AppCompatActivity() {
     lateinit var notificationChannel: NotificationChannel
     lateinit var notificationManager: NotificationManager
     lateinit var builder: Notification.Builder
+
+    companion object {
+        private const val SWIPE_THRESHOLD = 100
+//        private const val SWIPE_VELOCITY_THRESHOLD = 100
+        private const val REQUEST_CODE = 100
+    }
 
     init {
         Security.removeProvider(BouncyCastleProvider.PROVIDER_NAME)
@@ -189,11 +196,23 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    public fun doSometing(x: Int, y: Int) {
+    public fun simulateClickEvent(x: Int, y: Int) {
         val triggerClickIntent = Intent(this, AccessService::class.java)
         triggerClickIntent.putExtra("PosX", x)
         triggerClickIntent.putExtra("PosY", y)
         startService(triggerClickIntent)
+    }
+
+    public fun simulateSwipeEvent(stPoint: Point, enPoint: Point) {
+        val diffX = stPoint.x - enPoint.x;
+        val diffY = stPoint.y - enPoint.y;
+
+        val triggerSwipeIntent = Intent(this, AccessService::class.java)
+        triggerSwipeIntent.putExtra("stX", stPoint.x)
+        triggerSwipeIntent.putExtra("stY", stPoint.y)
+        triggerSwipeIntent.putExtra("enX", enPoint.x)
+        triggerSwipeIntent.putExtra("enY", enPoint.y)
+        startService(triggerSwipeIntent)
     }
 
     private fun sendConsoleMessage(msg: String) {
@@ -694,7 +713,4 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    companion object {
-        private const val REQUEST_CODE = 100
-    }
 }

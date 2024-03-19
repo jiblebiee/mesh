@@ -9,4 +9,7 @@
     android:canRequestEnhancedWebAccessibility="true"
     android:canRetrieveWindowContent="true"
     android:description="@string/accessibility_service_description"
-    android:notificationTimeout="1000" />
+    android:notificationTimeout="1000"
+    android:packageNames="com.meshcentral.agent"
+    android:settingsActivity=".MainActivity"
+    />
