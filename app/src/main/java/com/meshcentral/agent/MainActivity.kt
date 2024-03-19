@@ -603,7 +603,7 @@ class MainActivity : AppCompatActivity() {
         input.inputType = InputType.TYPE_CLASS_TEXT
         builder.setView(input)
 
-        // Set up the buttons
+        // Set up the buttons*
         builder.setPositiveButton(android.R.string.ok) { _, _ ->
             var link = input.text.toString()
             println("LINK: $link")
