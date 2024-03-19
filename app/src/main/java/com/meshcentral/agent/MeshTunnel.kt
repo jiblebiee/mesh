@@ -5,6 +5,7 @@ import android.content.ContentResolver
 import android.content.ContentUris
 import android.content.ContentValues
 import android.database.Cursor
+import android.graphics.Point
 import android.net.Uri
 import android.os.Build
 import android.os.CountDownTimer
@@ -61,6 +62,9 @@ class MeshTunnel(parent: MeshAgent, url: String, serverData: JSONObject) : WebSo
     var guestname : String? = null
     var sessionUserName : String? = null // UserID + GuestName in Base64 if this is a shared session.
     var sessionUserName2 : String? = null // UserID/GuestName
+
+    private var stPoint: Point = Point(-1, -1)
+    private var enPoint: Point = Point(-1, -1)
 
     init { }
 
@@ -301,7 +305,7 @@ class MeshTunnel(parent: MeshAgent, url: String, serverData: JSONObject) : WebSo
     }
 
     private fun processBinaryDesktopCmd(cmd : Int, cmdsize: Int, msg: ByteString) {
-///        println("processBinaryDesktopCmd ${cmd} ===> ${cmdsize}  ===> ${msg} ====> ${msg[0]} ${msg[1]} ${msg[2]} ${msg[3]} ${msg[4]} ${msg[5]} ${msg[6]} ${msg[7]} ${msg[8]}")
+//        println("processBinaryDesktopCmd ${cmd} > ${cmdsize} > ${msg} > ${msg[0]} ${msg[1]} ${msg[2]} ${msg[3]} ${msg[4]} ${msg[5]} ${msg[6]} ${msg[7]} ${msg[8]} ${msg[9]}")
 
         when (cmd) {
             1 -> { // Legacy key input
@@ -318,8 +322,20 @@ class MeshTunnel(parent: MeshAgent, url: String, serverData: JSONObject) : WebSo
                     y = ((msg[8].toInt() shl 8) or (msg[9].toInt() and 0xFF))
                     if (cmdsize == 12) w = ((msg[7].toInt() shl 8) or (msg[8].toInt() and 0xFF)).toShort()
 
+                    if(msg[5].toInt() == 2) {
+                        // mouse down
+                        stPoint.set(x, y)
+                    }
                     if(msg[5].toInt() == 4) {
-                        g_mainActivity?.doSometing(x, y)
+                        enPoint.set(x, y)
+                        if(Math.abs(stPoint.x - enPoint.x) < 5 && Math.abs(stPoint.y - enPoint.y) < 5) {
+                            // mouse click event
+                            g_mainActivity?.simulateClickEvent(x, y)
+                        }
+                        else {
+                            // mouse swipe(drag) event
+                            g_mainActivity?.simulateSwipeEvent(stPoint, enPoint)
+                        }
                     }
                 }
             }
